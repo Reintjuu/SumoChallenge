@@ -4,15 +4,12 @@ using System.Collections;
 [RequireComponent(typeof(Rigidbody2D))]
 public class CharacterMovement : MonoBehaviour
 {
-	[SerializeField]
-	private float speed = 2f;
-	[SerializeField]
-	private float jumpForce = 100f;
-	[SerializeField]
-	private float groundedTreshhold = .5f;
+	[SerializeField] private float speed = 2f;
+	[SerializeField] private float jumpForce = 100f;
+	[SerializeField] private float groundedTreshhold = .5f;
 
 	private float move = 0f;
-	private bool isGrounded = false;
+	private bool grounded = false;
 	private GameObject groundedOn = null;
 	private Rigidbody2D body;
 
@@ -21,20 +18,20 @@ public class CharacterMovement : MonoBehaviour
 		body = GetComponent<Rigidbody2D>();
 	}
 
-	void OnCollisionEnter2D(Collision2D collision)
+	void OnCollisionEnter2D(Collision2D collidee)
 	{
-		if(collision.gameObject.GetComponent<Rigidbody2D>().isKinematic)
-		{
-			foreach(ContactPoint2D contact in collision.contacts)
+		//if(collidee.gameObject.GetComponent<Rigidbody2D>().isKinematic)
+		//{
+			foreach(ContactPoint2D contact in collidee.contacts)
 			{
 				if (contact.normal.y > groundedTreshhold)
 				{
-					isGrounded = true;
-					groundedOn = collision.gameObject;
+					grounded = true;
+					groundedOn = collidee.gameObject;
 					break;
 				}
 			}
-		}
+		//}
 	}
 
 	void OnCollisionExit2D(Collision2D collision)
@@ -42,7 +39,7 @@ public class CharacterMovement : MonoBehaviour
 		if (collision.gameObject == groundedOn)
 		{
 			groundedOn = null;
-			isGrounded = false;
+			grounded = false;
 		}
 	}
 
@@ -51,7 +48,7 @@ public class CharacterMovement : MonoBehaviour
 		move = Input.GetAxis("Horizontal");
 		body.velocity = new Vector2(move * speed, body.velocity.y);
 
-		if (Input.GetKey(KeyCode.Space) && isGrounded)
+		if (Input.GetKey(KeyCode.Space) && grounded)
 		{
 			body.AddForce(new Vector2(body.velocity.x, jumpForce));
 		}
